@@ -88,6 +88,40 @@ def formatTeam(team):
         team = "north texas"
     elif team.lower() == "nc st":
         team = "nc state"
+    elif team.lower() == "p state":
+        team = "penn state"
+    elif team.lower() == "tenn":
+        team = "tennessee"
+    elif team.lower() == "s florida":
+        team = "south florida"
+    elif team.lower() == "pitt":
+        team = "pittsburgh"
+    elif team.lower() == "miami":
+        team = "miami (fl)"
+    elif team.lower() == "bc":
+        team = "boston college"
+    elif team.lower() == "nd":
+        team = "notre dame"
+    elif team.lower() == "s miss":
+        team = "southern miss"
+    elif team.lower() == "v tech":
+        team = "virginia tech"
+    elif team.lower() == "af":
+        team = "air force"
+    elif team.lower() == "nw":
+        team = "northwestern"
+    elif team.lower() == "sc":
+        team = "south carolina"
+    elif team.lower() == "gata":
+        team = "ga. southern"
+    elif team.lower() == "ohio st":
+        team = "ohio state"
+    elif team.lower() == "t tech":
+        team = "texas tech"
+    elif team.lower() == "cali":
+        team = "california"
+    elif team.lower() == "vt":
+        team = "virginia tech"
     return team
 
 def findPointsForTieBreaker(divs):

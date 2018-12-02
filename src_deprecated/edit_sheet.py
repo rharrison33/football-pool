@@ -19,7 +19,7 @@ import re
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 URL = 'https://www.cbssports.com/college-football/scoreboard/'
 #SPREADSHEET_ID = '1pUd8YEdkCUSG9WG3XrkYC1zw4e1o3LdUXluFarwr3mg'
-SPREADSHEET_ID = '1dZq4E5UKk_KeiHUk6ruuDajqPI40RaksgDDS-TO_dXA'
+SPREADSHEET_ID = '1Ui9DqzgqfhDGHrAWyHesGwT46SuuG-PLKGsAPAAog8U'
 
 def updateHTML():
     #use the function to update divs
@@ -31,7 +31,9 @@ def updateHTML():
         return divs
     except:
         print('Connection Error. Check your internet connection.')
-        return -1
+        minutes = 5 #how often to update sheet
+        time.sleep(int(minutes * 60))
+        updateHTML()
     
 def updateSheetWithWinner(service):
     values = getValuesFromSheet(service, 'M2:M16')
@@ -70,29 +72,28 @@ def updateSheetWithWinner(service):
             if this_tb <= best_tb:
                 best_tb = this_tb
         #find index of best tb
-        values = getValuesFromSheet(service, 'N2:N16')
-        index = 2
-        #clear winners list
-        winnersList = []
-        for value in values:
-            if int(value[0]) == best_tb:
-                winnersList.append(index)
-            index += 1
-        for winnersIndex in winnersList:
-            range_name = 'A' + str(winnersIndex)
+        for index in winnersList:
+            #go to tie breaker
+            range_name = 'N' + str(index) + ':N' + str(index)
             values = getValuesFromSheet(service, range_name)
-            winnersNames.append(values[0])
+            if (int(values[0][0]) == best_tb):
+                range_name = 'A' + str(index)
+                values = getValuesFromSheet(service, range_name)
+                winnersNames.append(values[0])
     #add names to sheet
     value_range_body = {
       "values": winnersNames
     }
     value_input_option = 'RAW'
     UPDATE_RANGE = "O2"
-    service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=UPDATE_RANGE, valueInputOption=value_input_option, body=value_range_body).execute()
+    service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, 
+            range=UPDATE_RANGE, valueInputOption=value_input_option,
+            body=value_range_body).execute()
     
 def getValuesFromSheet(service, range_name):   
     RANGE_NAME = range_name
-    result = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+    result = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID,
+            range=RANGE_NAME).execute()
     return result.get('values', []) 
 
 def main():
@@ -116,7 +117,18 @@ def main():
     value_input_option = 'RAW'
     UPDATE_RANGE = "M1:O1"
     request = service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=UPDATE_RANGE, valueInputOption=value_input_option, body=value_range_body)
-    response = request.execute()
+    
+    try:
+        response = request.execute()
+    except TimeoutError:
+        store = file.Storage('token.json')
+        creds = store.get()
+        if not creds or creds.invalid:
+            flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+            creds = tools.run_flow(flow, store)
+        request = service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=UPDATE_RANGE, valueInputOption=value_input_option, body=value_range_body)
+        service = build('sheets', 'v4', http=creds.authorize(Http()))
+        response = request.execute()
     
     # TODO: Change code below to process the `response` dict:
     print(response)
@@ -168,27 +180,45 @@ def main():
             value_input_option = 'RAW'
             
             UPDATE_RANGE = "M2:N16"
-            
             request = service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=UPDATE_RANGE, valueInputOption=value_input_option, body=value_range_body)
-            response = request.execute()
+            
+            try:
+                response = request.execute()
+            except TimeoutError:
+                store = file.Storage('token.json')
+                creds = store.get()
+                if not creds or creds.invalid:
+                    flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+                    creds = tools.run_flow(flow, store)
+                request = service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=UPDATE_RANGE, valueInputOption=value_input_option, body=value_range_body)
+                service = build('sheets', 'v4', http=creds.authorize(Http()))
+                response = request.execute()
             
             # TODO: Change code below to process the `response` dict:
             print("Sheet was updated at " + str(datetime.datetime.now()))
-            print("    games completed: " + str(games_completed))
-            print(response)
+            #print("    games completed: " + str(games_completed))
+            #print(response)
+            
+            t = datetime.datetime.today()
+            #print(str(t))
+            #if t.hour >= 20 and t.minute > 45:
+             #   print("Going to sleep at " + str(t.hour)
+              #        +':' + str(t.minute))
+               # time.sleep(10*3600)
             
             if all_games_are_final:
                 updateSheetWithWinner(service)
-                exit()
+                #break
         else:
             #connection error
             pass
                        
-        minutes = 1 #how often to update sheet
+        minutes = 2 #how often to update sheet
         time.sleep(int(minutes * 60))
         #end loop. updates sheet every minutes
     
-    os.remove('token.json')
+    #os.remove('token.json')
+    exit()
     
 
 if __name__ == '__main__':

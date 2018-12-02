@@ -65,6 +65,13 @@ def find_index(team, stringsList):
         index+=1
     return -1 #string not found
 
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 stringsList = list(soup.stripped_strings)
 #print(find_favorite("Missouri","South Carolina", stringsList))
 
@@ -80,6 +87,9 @@ findTBpoints = False
 count = 0
 for line in lines:
     tokens = line.split("vs")
+    if(line.strip().lower() == 'tb points'):
+        findTBpoints = True
+        continue
     if len(tokens) > 1 and not findTBpoints:
         #find faborite mode
         print(find_favorite(tokens[0].strip(), tokens[1].strip(), stringsList))
@@ -88,8 +98,6 @@ for line in lines:
     #tb points mode  
     if len(tokens) > 1 and findTBpoints:
         print(find_TBpoints(tokens[0].strip(), tokens[1].strip(), stringsList))
-    else:
-        findTBpoints = True
 print("Picks made: " + str(count))
 
 tie_break_file.close()

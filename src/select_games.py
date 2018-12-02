@@ -4,16 +4,26 @@ from bs4 import BeautifulSoup
 def getTeamNames(anchors):
     if len(anchors) != 2:
         print("error: getTeamNames was passed a bad argument.")
-    return [anchors[0].text.strip().lower(), anchors[1].text.strip().lower()]
+    return [anchors[0].text.strip(), anchors[1].text.strip()]
 
 def getSpread(spreadtd):
     stripped_strings = spreadtd.stripped_strings
     index = 0
     for string in stripped_strings:
         if string[0] == '-':
-            return [index, string.split()[0]]
+            spread = string.split()[0]
+            try:
+                spread = int(spread)
+            except:
+                #probably ran into 1/2
+                try:
+                    spread = int(spread[:3]) - .5
+                except:
+                    #probably ran into 1/2
+                    spread = int(spread[:2]) - .5
+            return [index, spread]
         index += 1
-    return [0, '0']
+    return [0, 0]
 
 
 
@@ -44,5 +54,7 @@ for tr in trs:
             break
 
 #we now have all the important games
-print(games)
+for game in games:
+    if game[2][1] > -8:
+        print(game[0] + ' vs ' + game[1] + ', ' + game[game[2][0]] + ' is ' + str(game[2][1]))
     
