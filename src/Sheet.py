@@ -12,7 +12,7 @@ from email._header_value_parser import get_group_list
 
 class Sheet(object):
     '''
-    Object to represent a Google Sheets object
+    Represents a Google Sheets object
     '''
     
     

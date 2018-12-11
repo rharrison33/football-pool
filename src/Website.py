@@ -1,7 +1,7 @@
 '''
 Created on Nov 4, 2018
 
-@author: rober
+@author: robert harrison
 '''
 
 from pathlib import Path

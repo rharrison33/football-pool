@@ -1,17 +1,18 @@
 '''
 Created on Oct 27, 2018
 
-@author: rober
+@author: robert harrison
 '''
 
 from Sheet import Sheet
 from Player import Player
 from Game import Game
-from src.make_picks import is_int
 
 class Manager(object):
     '''
     classdocs
+    
+    Helps manage the football pool tracker.
     '''
 
 
@@ -46,7 +47,7 @@ class Manager(object):
             for team_name in team_list:
                 if not team_name.strip():
                     continue
-                self.website.get_game_attrs(team_name)
+                self.website.formatTeam(team_name)
     
     def get_games(self):
         team_names = self.sheet.getValuesFromSheet("B2:L2")[0]
@@ -81,6 +82,7 @@ class Manager(object):
         game.been_updated = True
         if not game.is_tb_game:
             if len(winner_row_index_list) == 0:
+                #there should never be a game that has no winners
                 print("Error updating game: " + game.teams[0] + ' vs ' + game.teams[1])
                 raise Exception('Error updating game')
             self.sheet.color_winning_cells(winner_row_index_list, game.column_id)
