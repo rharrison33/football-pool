@@ -1,7 +1,7 @@
 '''
 Created on Oct 5, 2018
 
-Module for parsing html.
+Script for making picks by parsing html.
 
 @author: robert harrison
 '''
